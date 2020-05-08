@@ -8,8 +8,8 @@ import javax.imageio.stream.ImageInputStream;
 
 public class run{
 
-	
-	public static void main(String args[])  throws IOException{
+	//DRAWS LINE ACROSS PICTURE
+	public static void mainMethod(String args[])  throws IOException{
 		BufferedImage image = ImageIO.read(run.class.getResource("Blank.png"));
 		
 		final float imageSlope = ((float)image.getWidth()/(float)image.getHeight());
