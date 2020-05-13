@@ -44,21 +44,56 @@ public class ImageWrapper {
 			intensity++;
 		}
 		
+		class EdgeStruct{
+			public int xStrength;
+			public int yStrength;
+			public int pixelDirection;
+			public EdgeStruct(int x, int y) {
+				xStrength = x;
+				yStrength = y;
+				pixelDirection = (int)Math.atan(x/y);
+			}
+			
+			public int getXStrength() {
+				return xStrength;
+			}
+		}
 		
+
+		//TODO: APPLY SurroundingPixels2D for each pixel from colorPallete to XEdgeIntensityKernel
+		// and YEdgeIntensityKernel. Add each returning value into the constructor of EdgeStruct
+		EdgeStruct edgeProperties[][] = new EdgeStruct[height][width];
+		
+		//i = height, j = width
+		for(int i = (intensity/2); i < height-(intensity/2); i++) {
+			for(int j = (intensity/2); j < width-(intensity/2); j++) {
+				//edgeProperties[i][j] = EdgeStruct(XEdgeIntensityKernel(), YEdgeIntensityKernel());
+				edgeProperties[i][j] = new EdgeStruct(XEdgeIntensityKernel(SurroundingPixels2D(i, j, intensity), intensity, intensity), 1);
+			}
+		}
+		
+		//TODO: LEFT OFF HERE, all values in edgeProperties are negative for some reason
+		for(int i = 0; i < 1000; i++) {
+			if(edgeProperties[i][i]!= null)
+		System.out.println(edgeProperties[i][i].getXStrength());
+		}
+		//TODO: This is the image we will draw on
+		//BufferedImage edgeImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
 	}
 	
 	//TODO: Watch video again to see how we should be coloring the edges
 	//TODO: scale the values to be between -255 <-> 255 in order to be black and white edges
+	//TODO: Create YEdgeIntensityKernel
 	//return a value depicting how strongly white or black to color the edge
-	public int EdgeIntensityKernel(int[][] colors, int height, int width) {
+	public int XEdgeIntensityKernel(int[][] colors, int height, int width) {
 		//ADDS FROM THE TOP DOWN
 		int leftIntensity = 0;
 		int rightIntensity = 0;
 		int modifier = width/3;
 		int powerModifier = 0;
-		for(int i = 0; i < width; i++) {
+		for(int i = 0; i < width-1; i++) {
 			powerModifier = 0;
-			for(int j = 0; j < height; j++) {
+			for(int j = 0; j < height-1; j++) {
 				//we are within the ignored block
 				if(i >= modifier && i < (width - modifier))
 					break;
@@ -108,17 +143,34 @@ public class ImageWrapper {
 	}
 	
 	
-	//i = height, j = width
+	//i = height, j = width, kernelSize is the width of the kernel
 	public int[] SurroundingPixels(int i, int j, int kernelSize) {
 		int[] toReturn = new int[(kernelSize*kernelSize)];
 		int toReturnIncrement = 0;
 		//k = height, l = width
 		for(int k = -(kernelSize/2); k <= (kernelSize/2); k++) {
 			for(int l = -(kernelSize/2); l <= (kernelSize/2); l++) {
-				//toReturn[toReturnIncrement] = new Color(modifiedImage.getRGB(j+l, i+k)).getRed();
 				toReturn[toReturnIncrement] = colorPallete[i+k][j+l];
 				toReturnIncrement++;
 			}
+		}
+		
+		return toReturn;
+	}
+	
+	//i = height, j = width, kernelSize is the width of the kernel
+	public int[][] SurroundingPixels2D(int i, int j, int kernelSize) {
+		int[][] toReturn = new int[kernelSize][kernelSize];
+		int incrementX = 0;
+		int incrementY = 0;
+		//k = height, l = width
+		for(int k = -(kernelSize/2); k <= (kernelSize/2); k++) {
+			for(int l = -(kernelSize/2); l <= (kernelSize/2); l++) {
+				toReturn[incrementY][incrementX] = colorPallete[i+k][j+l];
+				incrementX++;
+			}
+			incrementX = 0;
+			incrementY++;
 		}
 		
 		return toReturn;
@@ -157,4 +209,6 @@ public class ImageWrapper {
 	public BufferedImage GetModified() {
 		return modifiedImage;
 	}
+	
+	
 }
